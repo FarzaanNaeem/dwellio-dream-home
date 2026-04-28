@@ -10,7 +10,8 @@ export type Listing = {
   price: number;
   location: string;
   beds: string;
-  explanation: string;
+  strengths: string[];
+  tradeoffs: string[];
   match: number; // 0–100
 };
 
@@ -21,7 +22,8 @@ export const initialListings: Listing[] = [
     price: 2800,
     location: "Hoboken, NJ",
     beds: "1 bed · 1 bath",
-    explanation: "Great commute and within budget, slightly quieter area.",
+    strengths: ["Within budget with room to spare", "Strong PATH commute to midtown"],
+    tradeoffs: ["Slightly farther from a park than ideal"],
     match: 92,
   },
   {
@@ -30,7 +32,8 @@ export const initialListings: Listing[] = [
     price: 3150,
     location: "Williamsburg, Brooklyn",
     beds: "Loft · 1 bath",
-    explanation: "Loft layout with the natural light you mentioned wanting.",
+    strengths: ["Loft layout with abundant natural light", "Lively, walkable neighborhood"],
+    tradeoffs: ["$150 over your soft budget", "Busier street than you described"],
     match: 88,
   },
   {
@@ -39,7 +42,8 @@ export const initialListings: Listing[] = [
     price: 2650,
     location: "Upper West Side, NY",
     beds: "Studio · 1 bath",
-    explanation: "Quiet street near the park — fits your calm-neighborhood note.",
+    strengths: ["Quiet block one minute from the park", "Comfortably under budget"],
+    tradeoffs: ["Smaller footprint as a studio"],
     match: 84,
   },
   {
@@ -48,7 +52,8 @@ export const initialListings: Listing[] = [
     price: 2400,
     location: "Jersey City, NJ",
     beds: "1 bed · 1 bath",
-    explanation: "Best value in budget with strong PATH access to Manhattan.",
+    strengths: ["Best value in your range", "Solid PATH access to Manhattan"],
+    tradeoffs: ["Limited natural light in main room", "Few parks within walking distance"],
     match: 76,
   },
 ];
@@ -59,7 +64,8 @@ export const surpriseListing: Listing = {
   price: 2950,
   location: "Long Island City, NY",
   beds: "1 bed · 1 bath · skyline view",
-  explanation: "Just listed — better light and a skyline view at your price ceiling.",
+  strengths: ["Floor-to-ceiling light and skyline view", "At your price ceiling, not over"],
+  tradeoffs: ["Park access is a short walk, not next door"],
   match: 96,
 };
 

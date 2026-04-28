@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ThumbsUp, ThumbsDown, MapPin, Sparkles } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MapPin, Sparkles, Check, Minus } from "lucide-react";
 import { matchLabel, type Listing } from "@/lib/listings";
 import { cn } from "@/lib/utils";
 
