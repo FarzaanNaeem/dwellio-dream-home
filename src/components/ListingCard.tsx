@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { ThumbsUp, ThumbsDown, MapPin, Sparkles, Check, Minus } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MapPin, Sparkles, Check, Minus, Award } from "lucide-react";
 import { matchLabel, type Listing } from "@/lib/listings";
 import { cn } from "@/lib/utils";
 
 type Props = {
   listing: Listing;
   isNew?: boolean;
+  isBest?: boolean;
 };
 
-export function ListingCard({ listing, isNew }: Props) {
+export function ListingCard({ listing, isNew, isBest }: Props) {
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const [animKey, setAnimKey] = useState(0);
 
@@ -17,22 +18,31 @@ export function ListingCard({ listing, isNew }: Props) {
     setAnimKey((k) => k + 1);
   };
 
+  const elevated = isNew || isBest;
+
   return (
     <article
       id={`listing-${listing.id}`}
       className={cn(
-        "group relative overflow-hidden rounded-2xl bg-card border border-border/60 transition-all duration-500",
+        "group relative overflow-hidden rounded-2xl bg-card border transition-all duration-500",
         "hover:-translate-y-0.5",
+        elevated ? "border-primary/40" : "border-border/60",
         isNew && "ring-2 ring-primary/50 -translate-y-1 animate-slide-in",
+        isBest && !isNew && "ring-1 ring-primary/30",
       )}
-      style={{ boxShadow: isNew ? "var(--shadow-lift)" : "var(--shadow-soft)" }}
+      style={{ boxShadow: elevated ? "var(--shadow-lift)" : "var(--shadow-soft)" }}
     >
-      {isNew && (
+      {isNew ? (
         <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
           <Sparkles className="h-3 w-3" />
           New top match
         </div>
-      )}
+      ) : isBest ? (
+        <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">
+          <Award className="h-3 w-3" />
+          Best match
+        </div>
+      ) : null}
 
       <div className="aspect-[4/3] overflow-hidden bg-muted">
         <img
