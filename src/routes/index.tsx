@@ -43,12 +43,48 @@ function Index() {
   const [newId, setNewId] = useState<string | null>(null);
   const surpriseFired = useRef(false);
 
-  const handleQuery = (q: string) => {
+  const [sessionId, setSessionId] = useState(() => {
+    let id = localStorage.getItem("session_id");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("session_id", id);
+    }
+    return id;
+  });
+
+  const handleQuery = async (q: string) => {
     setQuery(q);
     setPhase("analyzing");
-    setListings(initialListings);
-    surpriseFired.current = false;
-    setNewId(null);
+
+    const res = await fetch("http://127.0.0.1:8001/api/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: q,
+        session_id: sessionId,
+      }),
+    });
+
+    const data = await res.json();
+
+    const transformedListings = data.results.map((l: any) => ({
+      id: l.id,
+      price: l.price,
+      location: l.location,
+
+      match: Math.round(l.score),
+
+      strengths: l.explanation?.summary ? [l.explanation.summary] : [],
+
+      tradeoffs: l.explanation?.tradeoffs || [],
+    }));
+
+    setListings(transformedListings);
+
+    setListings(data.results);
+    setPhase("ready");
   };
 
   // Analyzing → ready transition
@@ -60,25 +96,35 @@ function Index() {
   }, [query]);
 
   useEffect(() => {
-    if (!query || phase !== "ready" || surpriseFired.current) return;
-    surpriseFired.current = true;
-    const t = setTimeout(() => {
-      toast("Found a better match 👀", {
-        description: "Just listed in Long Island City — pinned to the top.",
-        duration: 5000,
-      });
-      setListings((prev) => [surpriseListing, ...prev.filter((l) => l.id !== surpriseListing.id)]);
-      setNewId(surpriseListing.id);
-      // Gently scroll the new card into view
-      requestAnimationFrame(() => {
-        document
-          .getElementById(`listing-${surpriseListing.id}`)
-          ?.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
-      setTimeout(() => setNewId(null), 5000);
-    }, 3500);
-    return () => clearTimeout(t);
-  }, [query, phase]);
+    if (!sessionId) return;
+
+    const es = new EventSource(`http://127.0.0.1:8001/api/events?session_id=${sessionId}`);
+
+    es.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === "better_listing") {
+        const l = data.listing;
+
+        const transformed = {
+          id: l.id,
+          price: l.price,
+          location: l.location,
+          match: Math.round(l.score),
+          strengths: l.explanation?.summary ? [l.explanation.summary] : [],
+          tradeoffs: l.explanation?.tradeoffs || [],
+        };
+
+        toast("🔥 Found a better match", {
+          description: "New listing added to the top",
+        });
+
+        setListings((prev) => [transformed, ...prev.filter((p) => p.id !== transformed.id)]);
+      }
+    };
+
+    return () => es.close();
+  }, [sessionId]);
 
   const reset = () => {
     setQuery(null);
@@ -103,7 +149,8 @@ function Index() {
             <em className="italic text-muted-foreground">in your own words.</em>
           </h1>
           <p className="mt-5 max-w-md text-center text-sm leading-relaxed text-muted-foreground md:text-base">
-            Skip the filters. Tell Dwellio what matters — light, neighborhood, vibe — and we'll surface the listings that fit.
+            Skip the filters. Tell Dwellio what matters — light, neighborhood, vibe — and we'll surface the listings
+            that fit.
           </p>
           <div className="mt-10 w-full">
             <SearchInput onSubmit={handleQuery} />
@@ -126,10 +173,8 @@ function Index() {
         </button>
 
         <div className="mb-8 max-w-3xl">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Based on your preferences</p>
-          <h2 className="mt-1 font-serif text-2xl leading-snug text-foreground md:text-3xl">
-            "{query}"
-          </h2>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Searching for</p>
+          <h2 className="mt-1 font-serif text-2xl leading-snug text-foreground md:text-3xl">"{query}"</h2>
         </div>
 
         <div className="mb-8">
@@ -153,9 +198,7 @@ function Index() {
             {phase === "analyzing" ? "Analyzing your preferences…" : "Found your best matches"}
           </div>
           <p className="mt-2 text-sm leading-relaxed text-foreground/80 md:text-base">
-            {phase === "analyzing"
-              ? "Reading between the lines of what you described."
-              : buildSummary(query)}
+            {phase === "analyzing" ? "Reading between the lines of what you described." : buildSummary(query)}
           </p>
         </div>
 
@@ -166,24 +209,14 @@ function Index() {
           }
         >
           <div className="mb-5 flex items-baseline justify-between">
-            <h3 className="font-serif text-xl text-foreground">Best matches for you</h3>
+            <h3 className="font-serif text-xl text-foreground">Top matches</h3>
             <span className="text-xs text-muted-foreground">{listings.length} listings</span>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(() => {
-              const bestId = listings.reduce(
-                (acc, l) => (l.match > acc.match ? l : acc),
-                listings[0],
-              )?.id;
-              return listings.map((l) => (
-                <ListingCard
-                  key={l.id}
-                  listing={l}
-                  isNew={l.id === newId}
-                  isBest={l.id === bestId && l.id !== newId}
-                />
-              ));
+              const bestId = listings.reduce((acc, l) => (l.match > acc.match ? l : acc), listings[0])?.id;
+              return listings.map((l) => <ListingCard key={l.id} listing={l} sessionId={sessionId} />);
             })()}
           </div>
         </div>
