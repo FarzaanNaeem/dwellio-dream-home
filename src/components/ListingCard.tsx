@@ -19,12 +19,13 @@ export function ListingCard({ listing, isNew }: Props) {
 
   return (
     <article
+      id={`listing-${listing.id}`}
       className={cn(
-        "group relative overflow-hidden rounded-2xl bg-card border border-border/60 transition-all duration-300",
+        "group relative overflow-hidden rounded-2xl bg-card border border-border/60 transition-all duration-500",
         "hover:-translate-y-0.5",
-        isNew && "ring-2 ring-primary/40 animate-slide-in",
+        isNew && "ring-2 ring-primary/50 -translate-y-1 animate-slide-in",
       )}
-      style={{ boxShadow: "var(--shadow-soft)" }}
+      style={{ boxShadow: isNew ? "var(--shadow-lift)" : "var(--shadow-soft)" }}
     >
       {isNew && (
         <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
