@@ -11,6 +11,7 @@ export type Listing = {
   location: string;
   beds: string;
   explanation: string;
+  match: number; // 0–100
 };
 
 export const initialListings: Listing[] = [
@@ -21,6 +22,7 @@ export const initialListings: Listing[] = [
     location: "Hoboken, NJ",
     beds: "1 bed · 1 bath",
     explanation: "Great commute and within budget, slightly quieter area.",
+    match: 92,
   },
   {
     id: "l1",
@@ -29,6 +31,7 @@ export const initialListings: Listing[] = [
     location: "Williamsburg, Brooklyn",
     beds: "Loft · 1 bath",
     explanation: "Loft layout with the natural light you mentioned wanting.",
+    match: 88,
   },
   {
     id: "l3",
@@ -37,6 +40,7 @@ export const initialListings: Listing[] = [
     location: "Upper West Side, NY",
     beds: "Studio · 1 bath",
     explanation: "Quiet street near the park — fits your calm-neighborhood note.",
+    match: 84,
   },
   {
     id: "l4",
@@ -45,6 +49,7 @@ export const initialListings: Listing[] = [
     location: "Jersey City, NJ",
     beds: "1 bed · 1 bath",
     explanation: "Best value in budget with strong PATH access to Manhattan.",
+    match: 76,
   },
 ];
 
@@ -55,4 +60,12 @@ export const surpriseListing: Listing = {
   location: "Long Island City, NY",
   beds: "1 bed · 1 bath · skyline view",
   explanation: "Just listed — better light and a skyline view at your price ceiling.",
+  match: 96,
 };
+
+export function matchLabel(score: number): string {
+  if (score >= 90) return "Excellent fit";
+  if (score >= 80) return "Strong match";
+  if (score >= 70) return "Good match";
+  return "Fair match";
+}
