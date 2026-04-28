@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ThumbsUp, ThumbsDown, MapPin, Sparkles } from "lucide-react";
-import type { Listing } from "@/lib/listings";
+import { matchLabel, type Listing } from "@/lib/listings";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -45,18 +45,32 @@ export function ListingCard({ listing, isNew }: Props) {
       </div>
 
       <div className="p-6">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="font-serif text-3xl text-foreground">
-            ${listing.price.toLocaleString()}
-            <span className="text-base text-muted-foreground font-sans">/mo</span>
-          </h3>
-          <span className="text-xs text-muted-foreground">{listing.beds}</span>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="font-serif text-3xl text-foreground">
+              ${listing.price.toLocaleString()}
+              <span className="text-base text-muted-foreground font-sans">/mo</span>
+            </h3>
+            <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5" />
+              {listing.location}
+            </div>
+          </div>
+
+          <div
+            className="flex shrink-0 flex-col items-end gap-0.5 rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-right"
+            title={matchLabel(listing.match)}
+          >
+            <span className="font-serif text-sm leading-none text-foreground tabular-nums">
+              {listing.match}%
+            </span>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">
+              {matchLabel(listing.match)}
+            </span>
+          </div>
         </div>
 
-        <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5" />
-          {listing.location}
-        </div>
+        <div className="mt-3 text-xs text-muted-foreground">{listing.beds}</div>
 
         <p className="mt-4 text-sm leading-relaxed text-foreground/75">
           {listing.explanation}
