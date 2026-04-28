@@ -5,6 +5,9 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import { SearchInput } from "@/components/SearchInput";
 import { ListingCard } from "@/components/ListingCard";
 import { initialListings, surpriseListing, type Listing } from "@/lib/listings";
+import { buildSummary } from "@/lib/summary";
+
+type Phase = "analyzing" | "ready";
 
 export const Route = createFileRoute("/")({
   component: Index,
