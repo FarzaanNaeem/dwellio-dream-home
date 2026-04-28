@@ -60,18 +60,25 @@ function Index() {
   }, [query]);
 
   useEffect(() => {
-    if (!query || surpriseFired.current) return;
+    if (!query || phase !== "ready" || surpriseFired.current) return;
     surpriseFired.current = true;
     const t = setTimeout(() => {
       toast("Found a better match 👀", {
         description: "Just listed in Long Island City — pinned to the top.",
+        duration: 5000,
       });
       setListings((prev) => [surpriseListing, ...prev.filter((l) => l.id !== surpriseListing.id)]);
       setNewId(surpriseListing.id);
-      setTimeout(() => setNewId(null), 4000);
-    }, 4500);
+      // Gently scroll the new card into view
+      requestAnimationFrame(() => {
+        document
+          .getElementById(`listing-${surpriseListing.id}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      setTimeout(() => setNewId(null), 5000);
+    }, 3500);
     return () => clearTimeout(t);
-  }, [query]);
+  }, [query, phase]);
 
   const reset = () => {
     setQuery(null);
