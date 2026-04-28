@@ -126,7 +126,7 @@ function Index() {
         </button>
 
         <div className="mb-8 max-w-3xl">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Searching for</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Based on your preferences</p>
           <h2 className="mt-1 font-serif text-2xl leading-snug text-foreground md:text-3xl">
             "{query}"
           </h2>
@@ -166,7 +166,7 @@ function Index() {
           }
         >
           <div className="mb-5 flex items-baseline justify-between">
-            <h3 className="font-serif text-xl text-foreground">Top matches</h3>
+            <h3 className="font-serif text-xl text-foreground">Best matches for you</h3>
             <span className="text-xs text-muted-foreground">{listings.length} listings</span>
           </div>
 
