@@ -38,9 +38,26 @@ function Header() {
 
 function Index() {
   const [query, setQuery] = useState<string | null>(null);
+  const [phase, setPhase] = useState<Phase>("analyzing");
   const [listings, setListings] = useState<Listing[]>(initialListings);
   const [newId, setNewId] = useState<string | null>(null);
   const surpriseFired = useRef(false);
+
+  const handleQuery = (q: string) => {
+    setQuery(q);
+    setPhase("analyzing");
+    setListings(initialListings);
+    surpriseFired.current = false;
+    setNewId(null);
+  };
+
+  // Analyzing → ready transition
+  useEffect(() => {
+    if (!query) return;
+    setPhase("analyzing");
+    const t = setTimeout(() => setPhase("ready"), 1200);
+    return () => clearTimeout(t);
+  }, [query]);
 
   useEffect(() => {
     if (!query || surpriseFired.current) return;
@@ -58,6 +75,7 @@ function Index() {
 
   const reset = () => {
     setQuery(null);
+    setPhase("analyzing");
     setListings(initialListings);
     surpriseFired.current = false;
     setNewId(null);
