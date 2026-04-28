@@ -171,9 +171,20 @@ function Index() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {listings.map((l) => (
-              <ListingCard key={l.id} listing={l} isNew={l.id === newId} />
-            ))}
+            {(() => {
+              const bestId = listings.reduce(
+                (acc, l) => (l.match > acc.match ? l : acc),
+                listings[0],
+              )?.id;
+              return listings.map((l) => (
+                <ListingCard
+                  key={l.id}
+                  listing={l}
+                  isNew={l.id === newId}
+                  isBest={l.id === bestId && l.id !== newId}
+                />
+              ));
+            })()}
           </div>
         </div>
       </main>
