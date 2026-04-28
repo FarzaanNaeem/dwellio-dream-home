@@ -99,7 +99,7 @@ function Index() {
             Skip the filters. Tell Dwellio what matters — light, neighborhood, vibe — and we'll surface the listings that fit.
           </p>
           <div className="mt-10 w-full">
-            <SearchInput onSubmit={setQuery} />
+            <SearchInput onSubmit={handleQuery} />
           </div>
         </main>
       </div>
@@ -126,18 +126,48 @@ function Index() {
         </div>
 
         <div className="mb-8">
-          <SearchInput onSubmit={setQuery} initialValue={query} compact />
+          <SearchInput onSubmit={handleQuery} initialValue={query} compact />
         </div>
 
-        <div className="mb-5 flex items-baseline justify-between">
-          <h3 className="font-serif text-xl text-foreground">Top matches</h3>
-          <span className="text-xs text-muted-foreground">{listings.length} listings</span>
+        {/* Agent status + dynamic summary */}
+        <div
+          key={phase + query}
+          className="mb-8 rounded-2xl border border-border bg-card/60 px-5 py-4 animate-[fade-in_0.4s_ease-out]"
+          style={{ boxShadow: "var(--shadow-soft)" }}
+        >
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+            <span
+              className={
+                phase === "analyzing"
+                  ? "inline-block h-1.5 w-1.5 rounded-full bg-foreground/60 animate-pulse"
+                  : "inline-block h-1.5 w-1.5 rounded-full bg-primary"
+              }
+            />
+            {phase === "analyzing" ? "Analyzing your preferences…" : "Found your best matches"}
+          </div>
+          <p className="mt-2 text-sm leading-relaxed text-foreground/80 md:text-base">
+            {phase === "analyzing"
+              ? "Reading between the lines of what you described."
+              : buildSummary(query)}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {listings.map((l) => (
-            <ListingCard key={l.id} listing={l} isNew={l.id === newId} />
-          ))}
+        <div
+          className={
+            "transition-all duration-500 " +
+            (phase === "analyzing" ? "opacity-0 translate-y-2 pointer-events-none" : "opacity-100 translate-y-0")
+          }
+        >
+          <div className="mb-5 flex items-baseline justify-between">
+            <h3 className="font-serif text-xl text-foreground">Top matches</h3>
+            <span className="text-xs text-muted-foreground">{listings.length} listings</span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {listings.map((l) => (
+              <ListingCard key={l.id} listing={l} isNew={l.id === newId} />
+            ))}
+          </div>
         </div>
       </main>
     </div>
