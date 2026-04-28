@@ -5,17 +5,27 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   listing: Listing;
-  isNew?: boolean;
-  isBest?: boolean;
+  sessionId: string;
 };
 
 export function ListingCard({ listing, isNew, isBest }: Props) {
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const [animKey, setAnimKey] = useState(0);
 
-  const handleVote = (v: "up" | "down") => {
+  const handleVote = async (v: "up" | "down") => {
     setVote(vote === v ? null : v);
-    setAnimKey((k) => k + 1);
+
+    await fetch("http://127.0.0.1:8001/api/feedback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        session_id: sessionId,
+        listing_id: listing.id,
+        action: v === "up" ? "like" : "dislike",
+      }),
+    });
   };
 
   const elevated = isNew || isBest;
@@ -72,9 +82,7 @@ export function ListingCard({ listing, isNew, isBest }: Props) {
             className="flex shrink-0 flex-col items-end gap-0.5 rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-right"
             title={matchLabel(listing.match)}
           >
-            <span className="font-serif text-sm leading-none text-foreground tabular-nums">
-              {listing.match}%
-            </span>
+            <span className="font-serif text-sm leading-none text-foreground tabular-nums">{listing.match}%</span>
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none">
               {matchLabel(listing.match)}
             </span>
@@ -109,10 +117,7 @@ export function ListingCard({ listing, isNew, isBest }: Props) {
                 : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground",
             )}
           >
-            <ThumbsUp
-              key={`up-${animKey}-${vote}`}
-              className={cn("h-4 w-4", vote === "up" && "animate-pop")}
-            />
+            <ThumbsUp key={`up-${animKey}-${vote}`} className={cn("h-4 w-4", vote === "up" && "animate-pop")} />
           </button>
           <button
             onClick={() => handleVote("down")}
@@ -124,13 +129,14 @@ export function ListingCard({ listing, isNew, isBest }: Props) {
                 : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground",
             )}
           >
-            <ThumbsDown
-              key={`down-${animKey}-${vote}`}
-              className={cn("h-4 w-4", vote === "down" && "animate-pop")}
-            />
+            <ThumbsDown key={`down-${animKey}-${vote}`} className={cn("h-4 w-4", vote === "down" && "animate-pop")} />
           </button>
           <span className="ml-auto text-xs text-muted-foreground">
-            {vote === "up" ? "Saved to favorites" : vote === "down" ? "Got it — less like this" : "Was this a good match?"}
+            {vote === "up"
+              ? "Saved to favorites"
+              : vote === "down"
+                ? "Got it — less like this"
+                : "Was this a good match?"}
           </span>
         </div>
       </div>
