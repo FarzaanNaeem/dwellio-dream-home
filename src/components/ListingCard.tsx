@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ThumbsUp, ThumbsDown, MapPin, Sparkles } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MapPin, Sparkles, Check, Minus } from "lucide-react";
 import { matchLabel, type Listing } from "@/lib/listings";
 import { cn } from "@/lib/utils";
 
@@ -72,9 +72,20 @@ export function ListingCard({ listing, isNew }: Props) {
 
         <div className="mt-3 text-xs text-muted-foreground">{listing.beds}</div>
 
-        <p className="mt-4 text-sm leading-relaxed text-foreground/75">
-          {listing.explanation}
-        </p>
+        <ul className="mt-4 space-y-1.5 text-sm leading-relaxed">
+          {listing.strengths.map((s) => (
+            <li key={s} className="flex items-start gap-2 text-foreground/85">
+              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2.5} />
+              <span>{s}</span>
+            </li>
+          ))}
+          {listing.tradeoffs.map((t) => (
+            <li key={t} className="flex items-start gap-2 text-muted-foreground">
+              <Minus className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/70" strokeWidth={2.5} />
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
 
         <div className="mt-6 flex items-center gap-2 border-t border-border/60 pt-4">
           <button
