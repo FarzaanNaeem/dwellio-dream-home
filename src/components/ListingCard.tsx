@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { ThumbsUp, ThumbsDown, MapPin, Sparkles, Check, Minus, Award } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MapPin, Sparkles, Check, AlertCircle, Award } from "lucide-react";
 import { matchLabel, type Listing } from "@/lib/listings";
 import { cn } from "@/lib/utils";
 
 type Props = {
   listing: Listing;
   sessionId: string;
+  isNew?: boolean;
+  isBest?: boolean;
 };
 
-export function ListingCard({ listing, isNew, isBest }: Props) {
+export function ListingCard({ listing, sessionId, isNew, isBest }: Props) {
   const [vote, setVote] = useState<"up" | "down" | null>(null);
-  const [animKey, setAnimKey] = useState(0);
+  const [animKey] = useState(0);
 
   const handleVote = async (v: "up" | "down") => {
     setVote(vote === v ? null : v);
@@ -29,6 +31,8 @@ export function ListingCard({ listing, isNew, isBest }: Props) {
   };
 
   const elevated = isNew || isBest;
+  const hasStrengths = listing.strengths && listing.strengths.length > 0;
+  const hasTradeoffs = listing.tradeoffs && listing.tradeoffs.length > 0;
 
   return (
     <article
@@ -91,20 +95,41 @@ export function ListingCard({ listing, isNew, isBest }: Props) {
 
         <div className="mt-3 text-xs text-muted-foreground">{listing.beds}</div>
 
-        <ul className="mt-4 space-y-1.5 text-sm leading-relaxed">
-          {listing.strengths.map((s) => (
-            <li key={s} className="flex items-start gap-2 text-foreground/85">
-              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2.5} />
-              <span>{s}</span>
-            </li>
-          ))}
-          {listing.tradeoffs.map((t) => (
-            <li key={t} className="flex items-start gap-2 text-muted-foreground">
-              <Minus className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/70" strokeWidth={2.5} />
-              <span>{t}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 space-y-3">
+          {hasStrengths && (
+            <div>
+              <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-primary">
+                <Check className="h-3 w-3" strokeWidth={2.5} />
+                Matches
+              </div>
+              <ul className="space-y-1 text-sm leading-relaxed">
+                {listing.strengths.map((s) => (
+                  <li key={s} className="flex items-start gap-2 text-foreground/85">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2.5} />
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {hasTradeoffs && (
+            <div className={cn(hasStrengths && "border-t border-border/50 pt-3")}>
+              <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                <AlertCircle className="h-3 w-3" strokeWidth={2.5} />
+                Tradeoffs
+              </div>
+              <ul className="space-y-1 text-sm leading-relaxed">
+                {listing.tradeoffs.map((t) => (
+                  <li key={t} className="flex items-start gap-2 text-muted-foreground">
+                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/70" strokeWidth={2.5} />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
         <div className="mt-6 flex items-center gap-2 border-t border-border/60 pt-4">
           <button
