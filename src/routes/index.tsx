@@ -76,14 +76,13 @@ function Index() {
 
       match: Math.round(l.score),
 
-      strengths: l.explanation?.summary ? [l.explanation.summary] : [],
+      strengths:
+        l.explanation?.strengths ?? (l.explanation?.summary ? [l.explanation.summary] : []),
 
       tradeoffs: l.explanation?.tradeoffs || [],
     }));
 
     setListings(transformedListings);
-
-    setListings(data.results);
     setPhase("ready");
   };
 
