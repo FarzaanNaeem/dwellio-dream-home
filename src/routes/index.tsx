@@ -105,12 +105,15 @@ function Index() {
       if (data.type === "better_listing") {
         const l = data.listing;
 
-        const transformed = {
+        const transformed: Listing = {
           id: l.id,
+          image: l.image ?? "",
           price: l.price,
           location: l.location,
+          beds: l.beds ?? "",
           match: Math.round(l.score),
-          strengths: l.explanation?.summary ? [l.explanation.summary] : [],
+          strengths:
+            l.explanation?.strengths ?? (l.explanation?.summary ? [l.explanation.summary] : []),
           tradeoffs: l.explanation?.tradeoffs || [],
         };
 
